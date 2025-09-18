@@ -1,0 +1,31 @@
+# Development files
+src/
+public/
+*.config.ts
+*.config.js
+tsconfig.json
+
+# Documentation
+README.md
+*.md
+
+# Environment files
+.env.example
+.env.local
+.env.development.local
+
+# Source maps
+*.map
+
+# Cache and logs
+.cache/
+logs/
+*.log
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
