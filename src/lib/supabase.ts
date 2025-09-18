@@ -7,7 +7,15 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+    // storage defaults to localStorage in browsers, but being explicit helps clarity
+    storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+  },
+})
 
 // Types para as tabelas
 export interface Client {

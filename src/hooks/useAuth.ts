@@ -10,6 +10,7 @@ export function useAuth() {
   const [currentEmployee, setCurrentEmployee] = useState<Employee | null>(null)
 
   const ensureEmployeeForUser = useCallback(async (u: User | null) => {
+    console.debug('[auth] ensureEmployeeForUser called', { userId: u?.id, email: u?.email })
     if (!u || !u.email) {
       setCurrentEmployee(null)
       return null
@@ -120,25 +121,47 @@ export function useAuth() {
 
     const init = async () => {
       try {
-        const { data, error } = await supabase.auth.getUser()
+        console.debug('[auth] init: fetching session')
+        const { data: sessionData, error } = await supabase.auth.getSession()
         if (error) throw error
+
+        let sessionUser = sessionData.session?.user ?? null
+
+        // Fallback: tenta getUser() caso não haja sessão imediata
+        if (!sessionUser) {
+          console.debug('[auth] init: no session found, falling back to getUser()')
+          const { data: userData, error: userErr } = await supabase.auth.getUser()
+          if (!userErr) {
+            sessionUser = userData.user ?? null
+          } else {
+            console.warn('[auth] init: getUser() error', userErr)
+          }
+        }
+
         if (mounted) {
-          setUser(data.user)
-          await ensureEmployeeForUser(data.user)
+          setUser(sessionUser)
+          console.debug('[auth] init: session resolved', { hasUser: !!sessionUser })
+          // Não bloquear a UI: provisionar funcionário em background
+          if (sessionUser) ensureEmployeeForUser(sessionUser)
         }
       } catch (err) {
         if (mounted) setError(err instanceof Error ? err.message : 'Erro de autenticação')
       } finally {
-        if (mounted) setLoading(false)
+        if (mounted) {
+          setLoading(false)
+          console.debug('[auth] init: loading=false')
+        }
       }
     }
 
     init()
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       const nextUser = session?.user ?? null
+      console.debug('[auth] onAuthStateChange', { event, hasUser: !!nextUser })
       setUser(nextUser)
-      await ensureEmployeeForUser(nextUser)
+      // Provisionar em background; não travar a UI
+      if (nextUser) ensureEmployeeForUser(nextUser)
     })
 
     return () => {

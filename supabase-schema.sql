@@ -1,3 +1,4 @@
+
 -- Criar tabela de clientes
 CREATE TABLE IF NOT EXISTS clients (
   id BIGSERIAL PRIMARY KEY,
