@@ -7,7 +7,10 @@ import {
   LogOut,
   User
 } from "lucide-react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
+import { ProfileDialog } from "@/components/ProfileDialog";
 
 import {
   Sidebar,
@@ -58,6 +61,9 @@ const navigationItems = [
 export function AppSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut, currentEmployee } = useAuth();
+  const [profileOpen, setProfileOpen] = useState(false);
   const currentPath = location.pathname;
   const isCollapsed = state === "collapsed";
 
@@ -133,26 +139,56 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="h-12">
-              <div className="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-surface-hover transition-all duration-200 cursor-pointer group">
-                <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center">
-                  <User className="w-4 h-4 text-white" />
-                </div>
-                
-                {!isCollapsed && (
-                  <div className="flex-1 animate-fade-in">
-                    <div className="font-medium text-foreground">Funcionário</div>
-                    <div className="text-xs text-muted-foreground">funcionario@empresa.com</div>
+              <div 
+                className="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-surface-hover transition-all duration-200 group cursor-pointer"
+                onClick={() => setProfileOpen(true)}
+                title="Editar perfil"
+              >
+                {currentEmployee?.avatar_url ? (
+                  <img
+                    src={currentEmployee.avatar_url}
+                    alt={currentEmployee.name}
+                    className="w-8 h-8 rounded-full border"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center">
+                    <User className="w-4 h-4 text-white" />
                   </div>
                 )}
                 
                 {!isCollapsed && (
-                  <LogOut className="w-4 h-4 text-muted-foreground group-hover:text-destructive transition-colors duration-200" />
+                  <div className="flex-1 animate-fade-in">
+                    <div className="font-medium text-foreground">{currentEmployee?.name || user?.user_metadata?.full_name || 'Usuário'}</div>
+                    <div className="text-xs text-muted-foreground">{currentEmployee?.email || user?.email || 'sem email'}</div>
+                  </div>
+                )}
+                
+                {!isCollapsed && (
+                  <button
+                    type="button"
+                    className="p-2 rounded hover:bg-destructive/10"
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      try {
+                        await signOut();
+                        navigate('/login');
+                      } catch (err) {
+                        console.error('Erro ao sair', err);
+                      }
+                    }}
+                    title="Sair"
+                  >
+                    <LogOut className="w-4 h-4 text-muted-foreground hover:text-destructive transition-colors duration-200" />
+                  </button>
                 )}
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
+      {/* Profile Dialog */}
+      <ProfileDialog open={profileOpen} onOpenChange={setProfileOpen} />
     </Sidebar>
   );
 }

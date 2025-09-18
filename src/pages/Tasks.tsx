@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loading, ErrorState, EmptyState } from "@/components/ui/loading";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { TaskForm } from "@/components/TaskForm";
 import { TaskDetail } from "@/components/TaskDetail";
 import { useTasks } from "@/hooks/useTasks";
@@ -66,7 +67,7 @@ export default function Tasks() {
     }
   };
 
-  const handleCreateTask = async (taskData: Omit<Task, 'id' | 'created_at' | 'updated_at' | 'client'>) => {
+  const handleCreateTask = async (taskData: Omit<Task, 'id' | 'created_at' | 'updated_at' | 'client' | 'assignee_employee'>) => {
     try {
       setFormLoading(true);
       await addTask(taskData);
@@ -97,7 +98,7 @@ export default function Tasks() {
 
   // Função removida - agora usando handleStatusChange
 
-  const handleEditSubmit = async (taskData: Omit<Task, 'id' | 'created_at' | 'updated_at' | 'client'>) => {
+  const handleEditSubmit = async (taskData: Omit<Task, 'id' | 'created_at' | 'updated_at' | 'client' | 'assignee_employee'>) => {
     if (!editingTask) return;
     
     try {
@@ -236,7 +237,16 @@ export default function Tasks() {
                   />
                   <div>
                     <p className="text-sm font-medium text-foreground">{task.client?.name || 'Cliente não encontrado'}</p>
-                    <p className="text-xs text-muted-foreground">{task.assignee}</p>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      {task.assignee_employee?.avatar_url && (
+                        <img
+                          src={task.assignee_employee.avatar_url}
+                          alt={task.assignee_employee.name}
+                          className="w-4 h-4 rounded-full border"
+                        />
+                      )}
+                      <span>{task.assignee_employee?.name || task.assignee}</span>
+                    </div>
                   </div>
                 </div>
                 
@@ -382,21 +392,21 @@ export default function Tasks() {
         />
       )}
 
-      {/* Modal do Formulário */}
-      {showForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+      {/* Modal do Formulário - estilo consistente com ProfileDialog */}
+      <Dialog open={showForm} onOpenChange={(open) => { if (!open) { setShowForm(false); setEditingTask(null); }}}>
+        <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editingTask ? 'Editar Tarefa' : 'Nova Tarefa'}</DialogTitle>
+          </DialogHeader>
           <TaskForm
             onSubmit={editingTask ? handleEditSubmit : handleCreateTask}
-            onCancel={() => {
-              setShowForm(false);
-              setEditingTask(null);
-            }}
+            onCancel={() => { setShowForm(false); setEditingTask(null); }}
             loading={formLoading}
             initialData={editingTask}
             isEditing={!!editingTask}
           />
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
 
       {/* Modal de Visualização */}
       {selectedTask && (

@@ -13,7 +13,8 @@ export function useTasks() {
         .from('tasks')
         .select(`
           *,
-          client:clients(*)
+          client:clients(*),
+          assignee_employee:employees(*)
         `)
         .order('created_at', { ascending: false })
 
@@ -26,14 +27,15 @@ export function useTasks() {
     }
   }
 
-  const addTask = async (task: Omit<Task, 'id' | 'created_at' | 'updated_at' | 'client'>) => {
+  const addTask = async (task: Omit<Task, 'id' | 'created_at' | 'updated_at' | 'client' | 'assignee_employee'>) => {
     try {
       const { data, error } = await supabase
         .from('tasks')
         .insert([task])
         .select(`
           *,
-          client:clients(*)
+          client:clients(*),
+          assignee_employee:employees(*)
         `)
         .single()
 
@@ -54,7 +56,8 @@ export function useTasks() {
         .eq('id', id)
         .select(`
           *,
-          client:clients(*)
+          client:clients(*),
+          assignee_employee:employees(*)
         `)
         .single()
 
@@ -104,7 +107,8 @@ export function useTasks() {
         .eq('id', id)
         .select(`
           *,
-          client:clients(*)
+          client:clients(*),
+          assignee_employee:employees(*)
         `)
         .single()
 
@@ -138,7 +142,8 @@ export function useTasks() {
         .eq('id', id)
         .select(`
           *,
-          client:clients(*)
+          client:clients(*),
+          assignee_employee:employees(*)
         `)
         .single()
 
@@ -167,7 +172,8 @@ export function useTasks() {
         .eq('id', id)
         .select(`
           *,
-          client:clients(*)
+          client:clients(*),
+          assignee_employee:employees(*)
         `)
         .single()
 

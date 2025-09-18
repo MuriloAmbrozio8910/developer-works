@@ -28,12 +28,25 @@ export interface Client {
   updated_at?: string
 }
 
+export interface Employee {
+  id: number
+  user_id?: string | null
+  name: string
+  email: string
+  role?: string | null
+  avatar_url?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
 export interface Task {
   id: number
   title: string
   description: string
   client_id?: number
   client?: Client
+  assignee_id?: number
+  assignee_employee?: Employee
   assignee: string
   priority: 'Baixa' | 'Média' | 'Alta'
   type: string

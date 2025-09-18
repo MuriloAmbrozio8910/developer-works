@@ -17,12 +17,35 @@ CREATE TABLE IF NOT EXISTS clients (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- (Alter table moved below employees creation)
+
+-- Criar tabela de funcionários (employees)
+CREATE TABLE IF NOT EXISTS employees (
+  id BIGSERIAL PRIMARY KEY,
+  user_id TEXT, -- opcional: pode referenciar auth.users se desejar
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  role VARCHAR(100),
+  avatar_url TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Trigger para manter updated_at de employees
+CREATE TRIGGER update_employees_updated_at BEFORE UPDATE ON employees
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Caso a tabela tasks já exista sem a coluna assignee_id, adicioná-la de forma idempotente
+ALTER TABLE IF EXISTS tasks
+  ADD COLUMN IF NOT EXISTS assignee_id BIGINT REFERENCES employees(id) ON DELETE SET NULL;
+
 -- Criar tabela de tarefas
 CREATE TABLE IF NOT EXISTS tasks (
   id BIGSERIAL PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
   description TEXT,
   client_id BIGINT REFERENCES clients(id) ON DELETE SET NULL,
+  assignee_id BIGINT REFERENCES employees(id) ON DELETE SET NULL,
   assignee VARCHAR(255),
   priority VARCHAR(50) DEFAULT 'Média' CHECK (priority IN ('Baixa', 'Média', 'Alta')),
   type VARCHAR(100),
@@ -73,12 +96,19 @@ INSERT INTO clients (name, contact, email, phone, photo, company, location, stat
 ('BigCompany Inc', 'Pedro Costa', 'pedro@bigcompany.com', '+55 31 77777-7777', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face', 'BigCompany', 'Belo Horizonte, MG', 'Inativo', 5, 'R$ 120.000', '2023-03-10', '2023-12-15'),
 ('DesignStudio Creative', 'Ana Lima', 'ana@designstudio.com', '+55 85 66666-6666', 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=80&h=80&fit=crop&crop=face', 'DesignStudio', 'Fortaleza, CE', 'Ativo', 1, 'R$ 15.000', '2023-11-05', '2024-01-12');
 
+-- Inserir dados de exemplo para funcionários
+INSERT INTO employees (name, email, role, avatar_url) VALUES
+('João Silva', 'joao@empresa.com', 'Developer', 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=80&h=80&fit=crop&crop=face'),
+('Maria Santos', 'maria@empresa.com', 'Designer', 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&h=80&fit=crop&crop=face'),
+('Pedro Costa', 'pedro@empresa.com', 'Backend', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face'),
+('Ana Lima', 'ana@empresa.com', 'PM', 'https://images.unsplash.com/photo-1558655146-364adaf1fcc9?w=80&h=80&fit=crop&crop=face');
+
 -- Inserir dados de exemplo para tarefas
-INSERT INTO tasks (title, description, client_id, assignee, priority, type, deadline, status, time_spent_seconds, time_spent, estimated_time, estimated_time_seconds, is_running, photos, notes, tags) VALUES
-('Implementar sistema de pagamento', 'Desenvolver integração com gateway de pagamento Stripe', 1, 'João Silva', 'Alta', 'Desenvolvimento', '2024-01-15', 'em_andamento', 16200, '4h 30m', '8h', 28800, true, ARRAY['https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400', 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400'], 'Integração com Stripe API v2. Implementar webhooks para confirmação de pagamento.', ARRAY['stripe', 'payment', 'api']),
-('Correção de bugs no frontend', 'Corrigir problemas de responsividade e validação de formulários', 2, 'Maria Santos', 'Média', 'Bug Fix', '2024-01-18', 'pendente', 8100, '2h 15m', '4h', 14400, false, ARRAY['https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=400'], 'Focar em dispositivos móveis. Testar em diferentes resoluções.', ARRAY['frontend', 'responsive', 'forms']),
-('Otimização de performance', 'Melhorar tempo de carregamento e otimizar consultas do banco', 3, 'Pedro Costa', 'Baixa', 'Otimização', '2024-01-25', 'concluida', 31500, '8h 45m', '8h', 28800, false, ARRAY['https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400', 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400'], 'Implementar cache Redis. Otimizar queries N+1. Comprimir imagens.', ARRAY['performance', 'database', 'optimization']),
-('Design de nova landing page', 'Criar layout responsivo e moderno para página inicial', 4, 'Ana Lima', 'Alta', 'Design', '2024-01-20', 'em_andamento', 22800, '6h 20m', '12h', 43200, false, ARRAY['https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400', 'https://images.unsplash.com/photo-1558655146-364adaf1fcc9?w=400', 'https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=400'], 'Seguir guidelines da marca. Usar cores primárias. Incluir call-to-actions.', ARRAY['design', 'landing', 'ui/ux']);
+INSERT INTO tasks (title, description, client_id, assignee_id, assignee, priority, type, deadline, status, time_spent_seconds, time_spent, estimated_time, estimated_time_seconds, is_running, photos, notes, tags) VALUES
+('Implementar sistema de pagamento', 'Desenvolver integração com gateway de pagamento Stripe', 1, 1, 'João Silva', 'Alta', 'Desenvolvimento', '2024-01-15', 'em_andamento', 16200, '4h 30m', '8h', 28800, true, ARRAY['https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400', 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400'], 'Integração com Stripe API v2. Implementar webhooks para confirmação de pagamento.', ARRAY['stripe', 'payment', 'api']),
+('Correção de bugs no frontend', 'Corrigir problemas de responsividade e validação de formulários', 2, 2, 'Maria Santos', 'Média', 'Bug Fix', '2024-01-18', 'pendente', 8100, '2h 15m', '4h', 14400, false, ARRAY['https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=400'], 'Focar em dispositivos móveis. Testar em diferentes resoluções.', ARRAY['frontend', 'responsive', 'forms']),
+('Otimização de performance', 'Melhorar tempo de carregamento e otimizar consultas do banco', 3, 3, 'Pedro Costa', 'Baixa', 'Otimização', '2024-01-25', 'concluida', 31500, '8h 45m', '8h', 28800, false, ARRAY['https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400', 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400'], 'Implementar cache Redis. Otimizar queries N+1. Comprimir imagens.', ARRAY['performance', 'database', 'optimization']),
+('Design de nova landing page', 'Criar layout responsivo e moderno para página inicial', 4, 4, 'Ana Lima', 'Alta', 'Design', '2024-01-20', 'em_andamento', 22800, '6h 20m', '12h', 43200, false, ARRAY['https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400', 'https://images.unsplash.com/photo-1558655146-364adaf1fcc9?w=400', 'https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=400'], 'Seguir guidelines da marca. Usar cores primárias. Incluir call-to-actions.', ARRAY['design', 'landing', 'ui/ux']);
 
 -- Criar tabela de recursos/ferramentas
 CREATE TABLE IF NOT EXISTS resources (
@@ -327,6 +357,7 @@ ALTER TABLE resource_categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE quick_links ENABLE ROW LEVEL SECURITY;
 ALTER TABLE wiki_templates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE wiki_categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE employees ENABLE ROW LEVEL SECURITY;
 
 -- Criar políticas básicas (permitir tudo por enquanto - ajuste conforme necessário)
 CREATE POLICY "Allow all operations on clients" ON clients FOR ALL USING (true);
@@ -337,3 +368,36 @@ CREATE POLICY "Allow all operations on resource_categories" ON resource_categori
 CREATE POLICY "Allow all operations on quick_links" ON quick_links FOR ALL USING (true);
 CREATE POLICY "Allow all operations on wiki_templates" ON wiki_templates FOR ALL USING (true);
 CREATE POLICY "Allow all operations on wiki_categories" ON wiki_categories FOR ALL USING (true);
+CREATE POLICY "Allow all operations on employees" ON employees FOR ALL USING (true);
+
+-- Storage bucket for avatars (run once; safe to re-run)
+-- Creates a public bucket named 'avatars' used for profile pictures
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('avatars', 'avatars', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Basic storage policies for 'avatars' bucket
+-- Public read access
+DROP POLICY IF EXISTS "Public read on avatars" ON storage.objects;
+CREATE POLICY "Public read on avatars"
+  ON storage.objects FOR SELECT
+  USING (bucket_id = 'avatars');
+
+-- Authenticated users can upload
+DROP POLICY IF EXISTS "Authenticated uploads to avatars" ON storage.objects;
+CREATE POLICY "Authenticated uploads to avatars"
+  ON storage.objects FOR INSERT TO authenticated
+  WITH CHECK (bucket_id = 'avatars');
+
+-- Owners can update their own files
+DROP POLICY IF EXISTS "Authenticated update own avatars" ON storage.objects;
+CREATE POLICY "Authenticated update own avatars"
+  ON storage.objects FOR UPDATE TO authenticated
+  USING (bucket_id = 'avatars' AND owner = auth.uid())
+  WITH CHECK (bucket_id = 'avatars' AND owner = auth.uid());
+
+-- Owners can delete their own files
+DROP POLICY IF EXISTS "Authenticated delete own avatars" ON storage.objects;
+CREATE POLICY "Authenticated delete own avatars"
+  ON storage.objects FOR DELETE TO authenticated
+  USING (bucket_id = 'avatars' AND owner = auth.uid());

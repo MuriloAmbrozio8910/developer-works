@@ -521,21 +521,21 @@ export const MyComponent: React.FC<Props> = ({ title, children }) => {
         </DialogContent>
       </Dialog>
 
-      {/* Modal do Formulário */}
-      {showForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+      {/* Modal do Formulário - estilo consistente com ProfileDialog */}
+      <Dialog open={showForm} onOpenChange={(open) => { if (!open) { setShowForm(false); setEditingTemplate(null); }}}>
+        <DialogContent className="sm:max-w-4xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editingTemplate ? 'Editar Template' : 'Novo Template'}</DialogTitle>
+          </DialogHeader>
           <WikiTemplateForm
             onSubmit={editingTemplate ? handleEditSubmit : handleCreateTemplate}
-            onCancel={() => {
-              setShowForm(false);
-              setEditingTemplate(null);
-            }}
+            onCancel={() => { setShowForm(false); setEditingTemplate(null); }}
             loading={formLoading}
             initialData={editingTemplate}
             isEditing={!!editingTemplate}
           />
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
 
       {/* Toast de Sucesso */}
       {copySuccess && (

@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Loading } from "@/components/ui/loading";
+import { TaskDetail } from "@/components/TaskDetail";
 import { useClients } from "@/hooks/useClients";
 import { useTasks } from "@/hooks/useTasks";
 import { useActivityLog } from "@/hooks/useActivityLog";
@@ -224,10 +225,17 @@ export default function Dashboard() {
                       <Building2 className="w-3 h-3" />
                       {task.client?.name || 'Sem cliente'}
                     </p>
-                    <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                    <div className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
                       <User className="w-3 h-3" />
-                      {task.assignee}
-                    </p>
+                      {task.assignee_employee?.avatar_url && (
+                        <img
+                          src={task.assignee_employee.avatar_url}
+                          alt={task.assignee_employee.name}
+                          className="w-4 h-4 rounded-full border"
+                        />
+                      )}
+                      <span>{task.assignee_employee?.name || task.assignee}</span>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge className={getPriorityColor(task.priority)}>
@@ -380,54 +388,14 @@ export default function Dashboard() {
         </CardContent>
       </Card>
 
-      {/* Modal de Visualização de Tarefa */}
+      {/* Modal de Visualização de Tarefa - estilo consistente */}
       {selectedTask && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-background rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-start mb-4">
-              <h2 className="text-xl font-bold">{selectedTask.title}</h2>
-              <Button variant="ghost" size="sm" onClick={() => setSelectedTask(null)}>
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-            
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm text-muted-foreground">Descrição</p>
-                <p className="text-foreground">{selectedTask.description || 'Sem descrição'}</p>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Cliente</p>
-                  <p className="text-foreground">{selectedTask.client?.name || 'Sem cliente'}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Responsável</p>
-                  <p className="text-foreground">{selectedTask.assignee}</p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Prioridade</p>
-                  <Badge className={getPriorityColor(selectedTask.priority)}>
-                    {selectedTask.priority}
-                  </Badge>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Status</p>
-                  <p className="text-foreground">{selectedTask.status}</p>
-                </div>
-              </div>
-              
-              <div>
-                <p className="text-sm text-muted-foreground">Tempo Trabalhado</p>
-                <p className="text-foreground">{selectedTask.time_spent}</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <TaskDetail
+          task={selectedTask}
+          onClose={() => setSelectedTask(null)}
+          onToggleTimer={toggleTimer}
+          onUpdateTask={(id, updates) => updateTask(id, updates)}
+        />
       )}
     </div>
   );

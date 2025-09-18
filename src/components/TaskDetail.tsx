@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { type Task } from "@/lib/supabase";
 import { 
   Calendar, 
@@ -111,32 +112,28 @@ export function TaskDetail({ task, onClose, onToggleTimer, onUpdateTask }: TaskD
     : 0;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-        <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
-          <div className="flex-1">
-            <CardTitle className="text-2xl flex items-center gap-3">
-              <Eye className="w-6 h-6" />
-              {task.title}
-            </CardTitle>
-            <div className="flex items-center gap-2 mt-2">
-              <Badge className={`${getPriorityColor(task.priority)} text-white`}>
-                {task.priority}
-              </Badge>
-              <Badge className={`${getStatusColor(task.status)} text-white`}>
-                {getStatusText(task.status)}
-              </Badge>
-              {task.type && (
-                <Badge variant="outline">{task.type}</Badge>
-              )}
-            </div>
-          </div>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="w-4 h-4" />
-          </Button>
-        </CardHeader>
+    <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-2xl flex items-center gap-3">
+            <Eye className="w-6 h-6" />
+            {task.title}
+          </DialogTitle>
+        </DialogHeader>
 
-        <CardContent className="space-y-6">
+        <div className="flex items-center gap-2 mt-2">
+          <Badge className={`${getPriorityColor(task.priority)} text-white`}>
+            {task.priority}
+          </Badge>
+          <Badge className={`${getStatusColor(task.status)} text-white`}>
+            {getStatusText(task.status)}
+          </Badge>
+          {task.type && (
+            <Badge variant="outline">{task.type}</Badge>
+          )}
+        </div>
+
+        <div className="space-y-6">
           {/* Cronômetro */}
           <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
             <CardContent className="pt-6">
@@ -209,13 +206,27 @@ export function TaskDetail({ task, onClose, onToggleTimer, onUpdateTask }: TaskD
               <div className="flex items-center gap-2 text-sm">
                 <User className="w-4 h-4 text-muted-foreground" />
                 <span className="font-medium">Responsável:</span>
-                <span>{task.assignee}</span>
+                {task.assignee_employee?.avatar_url && (
+                  <img
+                    src={task.assignee_employee.avatar_url}
+                    alt={task.assignee_employee.name}
+                    className="w-5 h-5 rounded-full border"
+                  />
+                )}
+                <span>{task.assignee_employee?.name || task.assignee}</span>
               </div>
 
               {task.client && (
                 <div className="flex items-center gap-2 text-sm">
                   <Building2 className="w-4 h-4 text-muted-foreground" />
                   <span className="font-medium">Cliente:</span>
+                  {task.client.photo && (
+                    <img
+                      src={task.client.photo}
+                      alt={task.client.name}
+                      className="w-5 h-5 rounded-full border"
+                    />
+                  )}
                   <span>{task.client.name}</span>
                 </div>
               )}
@@ -324,8 +335,8 @@ export function TaskDetail({ task, onClose, onToggleTimer, onUpdateTask }: TaskD
               {task.updated_at ? new Date(task.updated_at).toLocaleString('pt-BR') : 'N/A'}
             </div>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

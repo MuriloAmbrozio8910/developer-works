@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { type Client } from "@/lib/supabase";
 import { 
   Building2, 
@@ -31,35 +32,25 @@ export function ClientDetail({ client, onClose, onEdit }: ClientDetailProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-        <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
-          <div className="flex-1">
-            <CardTitle className="text-2xl flex items-center gap-3">
-              <Building2 className="w-6 h-6" />
-              {client.name}
-            </CardTitle>
-            <div className="flex items-center gap-2 mt-2">
-              <Badge className={`${getStatusColor(client.status)} border`}>
-                {client.status}
-              </Badge>
-              {client.company && (
-                <Badge variant="outline">{client.company}</Badge>
-              )}
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={onEdit}>
-              <Edit className="w-4 h-4 mr-2" />
-              Editar
-            </Button>
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
-        </CardHeader>
+    <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-2xl flex items-center gap-3">
+            <Building2 className="w-6 h-6" />
+            {client.name}
+          </DialogTitle>
+        </DialogHeader>
 
-        <CardContent className="space-y-6">
+        <div className="flex items-center gap-2 mt-2">
+          <Badge className={`${getStatusColor(client.status)} border`}>
+            {client.status}
+          </Badge>
+          {client.company && (
+            <Badge variant="outline">{client.company}</Badge>
+          )}
+        </div>
+
+        <div className="space-y-6">
           {/* Foto e Informações Básicas */}
           <div className="flex flex-col md:flex-row gap-6">
             {/* Foto */}
@@ -219,8 +210,17 @@ export function ClientDetail({ client, onClose, onEdit }: ClientDetailProps) {
               Editar Cliente
             </Button>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={onEdit}>
+            <Edit className="w-4 h-4 mr-2" />
+            Editar
+          </Button>
+          <Button variant="ghost" size="sm" onClick={onClose}>
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

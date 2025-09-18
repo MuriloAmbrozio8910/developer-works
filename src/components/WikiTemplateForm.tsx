@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -84,15 +83,7 @@ export function WikiTemplateForm({ onSubmit, onCancel, loading = false, initialD
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto h-[840px] overflow-y-scroll">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Code2 className="w-5 h-5" />
-          {isEditing ? 'Editar Template' : 'Novo Template'}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6">
           {/* Título */}
           <div className="space-y-2">
             <Label htmlFor="title">Título *</Label>
@@ -219,8 +210,6 @@ export function WikiTemplateForm({ onSubmit, onCancel, loading = false, initialD
               Cancelar
             </Button>
           </div>
-        </form>
-      </CardContent>
-    </Card>
+    </form>
   );
 }

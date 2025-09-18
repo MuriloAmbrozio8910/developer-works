@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loading, ErrorState, EmptyState } from "@/components/ui/loading";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ClientForm } from "@/components/ClientForm";
 import { ClientDetail } from "@/components/ClientDetail";
 import { useClients } from "@/hooks/useClients";
@@ -301,21 +302,18 @@ export default function Clients() {
         />
       )}
 
-      {/* Modal do Formulário */}
-      {showForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+      {/* Modal do Formulário - estilo consistente com ProfileDialog */}
+      <Dialog open={showForm} onOpenChange={(open) => { if (!open) { setShowForm(false); setEditingClient(null); }}}>
+        <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-y-auto">
           <ClientForm
             onSubmit={editingClient ? handleEditSubmit : handleCreateClient}
-            onCancel={() => {
-              setShowForm(false);
-              setEditingClient(null);
-            }}
+            onCancel={() => { setShowForm(false); setEditingClient(null); }}
             loading={formLoading}
             initialData={editingClient}
             isEditing={!!editingClient}
           />
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
 
       {/* Modal de Visualização */}
       {selectedClient && (
