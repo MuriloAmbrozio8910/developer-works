@@ -17,22 +17,7 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     outDir: "dist",
-    sourcemap: mode === "development",
-    minify: mode === "production" ? "esbuild" : false,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          ui: ['@radix-ui/react-dialog', '@radix-ui/react-tabs', '@radix-ui/react-select'],
-          supabase: ['@supabase/supabase-js'],
-          router: ['react-router-dom'],
-          icons: ['lucide-react'],
-        },
-      },
-    },
-    chunkSizeWarningLimit: 1000,
-  },
-  optimizeDeps: {
-    include: ['react', 'react-dom', '@supabase/supabase-js', 'react-router-dom'],
+    sourcemap: false,
+    minify: "esbuild",
   },
 }));
