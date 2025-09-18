@@ -1,9 +1,6 @@
 # Development files
-src/
-public/
-*.config.ts
-*.config.js
-tsconfig.json
+# Do NOT ignore source or config needed for build
+# Keep this file minimal to avoid excluding build-critical files
 
 # Documentation
 README.md
@@ -13,9 +10,6 @@ README.md
 .env.example
 .env.local
 .env.development.local
-
-# Source maps
-*.map
 
 # Cache and logs
 .cache/
