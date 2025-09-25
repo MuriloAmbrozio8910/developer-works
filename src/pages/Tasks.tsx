@@ -10,6 +10,7 @@ import { TaskForm } from "@/components/TaskForm";
 import { TaskDetail } from "@/components/TaskDetail";
 import { useTasks } from "@/hooks/useTasks";
 import { type Task } from "@/lib/supabase";
+import { stripHtml } from "@/lib/sanitize";
 import { 
   Search, 
   Plus, 
@@ -131,7 +132,7 @@ export default function Tasks() {
 
   const filteredTasks = tasks.filter(task => {
     const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         task.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         stripHtml(task.description).toLowerCase().includes(searchTerm.toLowerCase()) ||
                          task.client?.name?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesPriority = filterPriority === "all" || task.priority === filterPriority;
     return matchesSearch && matchesPriority;
@@ -216,11 +217,11 @@ export default function Tasks() {
           <Card key={task.id} className="bg-gradient-surface border-border hover:shadow-card transition-all duration-300 group">
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
-                <div className="flex-1">
+                <div className="flex-1 w-full">
                   <CardTitle className="text-lg text-foreground group-hover:text-primary transition-colors duration-200">
                     {task.title}
                   </CardTitle>
-                  <p className="text-sm text-muted-foreground mt-1">{task.description}</p>
+                  <p className="text-sm text-muted-foreground mt-1 whitespace-nowrap overflow-hidden text-ellipsis w-full">{stripHtml(task.description)}</p>
                 </div>
                 {getStatusIcon(task.status)}
               </div>

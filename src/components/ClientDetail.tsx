@@ -211,15 +211,6 @@ export function ClientDetail({ client, onClose, onEdit }: ClientDetailProps) {
             </Button>
           </div>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={onEdit}>
-            <Edit className="w-4 h-4 mr-2" />
-            Editar
-          </Button>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="w-4 h-4" />
-          </Button>
-        </div>
       </DialogContent>
     </Dialog>
   );

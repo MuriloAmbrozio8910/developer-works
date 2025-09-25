@@ -101,3 +101,95 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ReactQuill theme overrides - integrado ao design do app */
+@layer components {
+  .ql-container.ql-snow {
+    background-color: hsl(var(--background));
+    border-color: hsl(var(--border));
+    color: hsl(var(--foreground));
+  }
+
+  .ql-toolbar.ql-snow {
+    background: hsl(var(--surface));
+    border-color: hsl(var(--border));
+    border-top-left-radius: var(--radius);
+    border-top-right-radius: var(--radius);
+    padding: 6px 8px;
+  }
+
+  .ql-container.ql-snow {
+    border-bottom-left-radius: var(--radius);
+    border-bottom-right-radius: var(--radius);
+  }
+
+  .ql-editor {
+    min-height: 120px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .ql-editor.ql-blank::before {
+    color: hsl(var(--muted-foreground));
+    opacity: 0.6;
+    font-style: normal;
+  }
+
+  /* Botões e pickers */
+  .ql-snow .ql-stroke {
+    stroke: hsl(var(--muted-foreground));
+  }
+  .ql-snow .ql-fill,
+  .ql-snow .ql-stroke.ql-fill {
+    fill: hsl(var(--muted-foreground));
+  }
+  .ql-snow.ql-toolbar button:hover .ql-stroke,
+  .ql-snow.ql-toolbar button.ql-active .ql-stroke,
+  .ql-snow .ql-picker-label:hover .ql-stroke,
+  .ql-snow .ql-picker-label.ql-active .ql-stroke {
+    stroke: hsl(var(--primary));
+  }
+  .ql-snow.ql-toolbar button:hover .ql-fill,
+  .ql-snow.ql-toolbar button.ql-active .ql-fill,
+  .ql-snow .ql-picker-label:hover .ql-fill,
+  .ql-snow .ql-picker-label.ql-active .ql-fill {
+    fill: hsl(var(--primary));
+  }
+
+  .ql-snow .ql-picker {
+    color: hsl(var(--muted-foreground));
+  }
+  .ql-snow .ql-picker-options {
+    background: hsl(var(--surface));
+    border-color: hsl(var(--border));
+  }
+
+  /* Links e code block */
+  .ql-editor a {
+    color: hsl(var(--primary));
+    text-decoration: underline;
+  }
+  .ql-editor pre.ql-syntax,
+  .ql-snow .ql-code-block-container {
+    background: hsl(var(--muted));
+    color: hsl(var(--foreground));
+    border-radius: calc(var(--radius) - 4px);
+    padding: 0.75rem 1rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.875rem;
+  }
+
+  /* Listas e citações */
+  .ql-editor blockquote {
+    border-left: 3px solid hsl(var(--border));
+    margin: 0.5rem 0;
+    padding-left: 0.75rem;
+    color: hsl(var(--muted-foreground));
+  }
+  .ql-editor ul,
+  .ql-editor ol {
+    padding-left: 1.25rem;
+  }
+
+  /* Bordas de foco já são tratadas pelo wrapper do componente via focus-within */
+}

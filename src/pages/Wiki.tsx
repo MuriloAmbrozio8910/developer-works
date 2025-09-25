@@ -9,6 +9,7 @@ import { Loading, ErrorState, EmptyState } from "@/components/ui/loading";
 import { WikiTemplateForm } from "@/components/WikiTemplateForm";
 import { useWiki } from "@/hooks/useWiki";
 import { type WikiTemplate } from "@/lib/supabase";
+import { stripHtml, formatAndSanitizeHtml } from "@/lib/sanitize";
 import { 
   BookOpen, 
   Search,
@@ -28,6 +29,7 @@ import {
   Edit,
   Trash2
 } from "lucide-react";
+import { RichTextViewer } from "@/components/RichTextViewer";
 
 export default function Wiki() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -166,7 +168,7 @@ export const MyComponent: React.FC<Props> = ({ title, children }) => {
 
   const filteredTemplates = templates.filter(template => {
     const matchesSearch = template.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         template.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         stripHtml(template.description).toLowerCase().includes(searchTerm.toLowerCase()) ||
                          template.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesCategory = selectedCategory === "all" || template.category.toLowerCase() === selectedCategory.toLowerCase();
     
@@ -273,7 +275,7 @@ export const MyComponent: React.FC<Props> = ({ title, children }) => {
                         <CardTitle className="text-lg text-foreground group-hover:text-primary transition-colors duration-200">
                           {template.title}
                         </CardTitle>
-                        <p className="text-sm text-muted-foreground mt-1">{template.description}</p>
+                        <p className="text-sm text-muted-foreground mt-1">{stripHtml(template.description)}</p>
                       </div>
                       
                       <div className="flex items-center gap-2">
@@ -475,7 +477,7 @@ export const MyComponent: React.FC<Props> = ({ title, children }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Descrição</p>
-                  <p className="text-sm">{viewingTemplate.description}</p>
+                  <RichTextViewer content={viewingTemplate.description} className="mt-4" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Linguagem</p>

@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { type Task } from "@/lib/supabase";
+import { formatAndSanitizeHtml } from "@/lib/sanitize";
 import { 
   Calendar, 
   Clock, 
@@ -18,6 +19,7 @@ import {
   Eye,
   X
 } from "lucide-react";
+import { RichTextViewer } from "./RichTextViewer";
 
 interface TaskDetailProps {
   task: Task;
@@ -135,10 +137,10 @@ export function TaskDetail({ task, onClose, onToggleTimer, onUpdateTask }: TaskD
 
         <div className="space-y-6">
           {/* Cronômetro */}
-          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+          <Card>
             <CardContent className="pt-6">
               <div className="text-center space-y-4">
-                <div className="text-4xl font-mono font-bold text-blue-600">
+                <div className="text-4xl font-mono font-bold text-red-600">
                   {formatTime(currentTime)}
                 </div>
                 
@@ -266,9 +268,7 @@ export function TaskDetail({ task, onClose, onToggleTimer, onUpdateTask }: TaskD
                 <FileText className="w-4 h-4" />
                 Descrição
               </h3>
-              <p className="text-muted-foreground whitespace-pre-wrap">
-                {task.description}
-              </p>
+              <RichTextViewer content={task.description} className="mt-4" />
             </div>
           )}
 
@@ -316,9 +316,10 @@ export function TaskDetail({ task, onClose, onToggleTimer, onUpdateTask }: TaskD
             <div className="space-y-2">
               <h3 className="font-semibold">Notas Adicionais</h3>
               <div className="bg-muted p-4 rounded-lg">
-                <p className="text-muted-foreground whitespace-pre-wrap">
-                  {task.notes}
-                </p>
+                <div
+                  className="text-muted-foreground break-words"
+                  dangerouslySetInnerHTML={{ __html: formatAndSanitizeHtml(task.notes) }}
+                />
               </div>
             </div>
           )}
