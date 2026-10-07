@@ -54,7 +54,7 @@ export function ClientForm({ onSubmit, onCancel, loading = false, initialData, i
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const clientData: Omit<Client, 'id' | 'created_at' | 'updated_at'> = {
       name: formData.name,
       contact: formData.contact,
@@ -115,7 +115,7 @@ export function ClientForm({ onSubmit, onCancel, loading = false, initialData, i
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                placeholder="email@empresa.com"
+                placeholder="demo@example.invalid"
                 required
               />
             </div>

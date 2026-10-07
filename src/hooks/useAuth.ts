@@ -10,7 +10,7 @@ export function useAuth() {
   const [currentEmployee, setCurrentEmployee] = useState<Employee | null>(null)
 
   const ensureEmployeeForUser = useCallback(async (u: User | null) => {
-    console.debug('[auth] ensureEmployeeForUser called', { userId: u?.id, email: u?.email })
+    // Resolve the employee profile without logging personal data.
     if (!u || !u.email) {
       setCurrentEmployee(null)
       return null
@@ -18,7 +18,7 @@ export function useAuth() {
     const emailNorm = u.email.toLowerCase()
 
     // 1) Tenta achar por user_id
-    let { data: empByUserId, error: q1err } = await supabase
+    const { data: empByUserId, error: q1err } = await supabase
       .from('employees')
       .select('*')
       .eq('user_id', u.id)
@@ -36,7 +36,7 @@ export function useAuth() {
     }
 
     // 2) Tenta achar por email (caso já exista sem user_id)
-    let { data: empByEmail, error: q2err } = await supabase
+    const { data: empByEmail, error: q2err } = await supabase
       .from('employees')
       .select('*')
       .ilike('email', emailNorm)
@@ -82,7 +82,6 @@ export function useAuth() {
 
     if (insErr) {
       // Se violou unique por email, buscar/associar o existente
-      // @ts-ignore - code pode existir no objeto de erro
       if (insErr.code === '23505') {
         const { data: existing } = await supabase
           .from('employees')
@@ -168,7 +167,7 @@ export function useAuth() {
       mounted = false
       authListener.subscription.unsubscribe()
     }
-  }, [])
+  }, [ensureEmployeeForUser])
 
   const signIn = useCallback(async (email: string, password: string) => {
     setError(null)

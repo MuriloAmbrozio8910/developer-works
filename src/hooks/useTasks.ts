@@ -91,7 +91,7 @@ export function useTasks() {
       if (!task) return
 
       const now = new Date().toISOString()
-      const updates: any = { 
+      const updates: Partial<Task> = {
         is_running: !task.is_running,
         started_at: !task.is_running ? now : null
       }
@@ -135,7 +135,7 @@ export function useTasks() {
 
       const { data, error } = await supabase
         .from('tasks')
-        .update({ 
+        .update({
           time_spent_seconds: timeSpentSeconds,
           time_spent: formatTime(timeSpentSeconds)
         })
@@ -164,7 +164,7 @@ export function useTasks() {
     try {
       const { data, error } = await supabase
         .from('tasks')
-        .update({ 
+        .update({
           status,
           // Se estiver marcando como concluída, parar o timer
           is_running: status === 'concluida' ? false : undefined

@@ -1,3 +1,4 @@
+import type { LucideIcon } from "lucide-react";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,8 +11,8 @@ import { WikiTemplateForm } from "@/components/WikiTemplateForm";
 import { useWiki } from "@/hooks/useWiki";
 import { type WikiTemplate } from "@/lib/supabase";
 import { stripHtml, formatAndSanitizeHtml } from "@/lib/sanitize";
-import { 
-  BookOpen, 
+import {
+  BookOpen,
   Search,
   Plus,
   Copy,
@@ -104,7 +105,7 @@ export const MyComponent: React.FC<Props> = ({ title, children }) => {
 
   const handleEditSubmit = async (templateData: Omit<WikiTemplate, 'id' | 'created_at' | 'updated_at'>) => {
     if (!editingTemplate) return;
-    
+
     try {
       setFormLoading(true);
       await updateTemplate(editingTemplate.id, templateData);
@@ -154,7 +155,7 @@ export const MyComponent: React.FC<Props> = ({ title, children }) => {
   ];
 
   function getIconByName(iconName: string) {
-    const icons: { [key: string]: any } = {
+    const icons: Record<string, LucideIcon> = {
       BookOpen,
       Globe,
       Database,
@@ -171,8 +172,8 @@ export const MyComponent: React.FC<Props> = ({ title, children }) => {
                          stripHtml(template.description).toLowerCase().includes(searchTerm.toLowerCase()) ||
                          template.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesCategory = selectedCategory === "all" || template.category.toLowerCase() === selectedCategory.toLowerCase();
-    
-    
+
+
     return matchesSearch && matchesCategory;
   });
 
@@ -190,9 +191,9 @@ export const MyComponent: React.FC<Props> = ({ title, children }) => {
             <p className="text-muted-foreground">Repositório de templates e códigos reutilizáveis</p>
           </div>
         </div>
-        <ErrorState 
-          message={`Erro ao carregar templates: ${error}`} 
-          onRetry={() => window.location.reload()} 
+        <ErrorState
+          message={`Erro ao carregar templates: ${error}`}
+          onRetry={() => window.location.reload()}
         />
       </div>
     );
@@ -207,7 +208,7 @@ export const MyComponent: React.FC<Props> = ({ title, children }) => {
           <p className="text-muted-foreground">Repositório de templates e códigos reutilizáveis</p>
         </div>
         <div className="flex gap-2">
-          <Button 
+          <Button
             onClick={() => setShowForm(true)}
             className="bg-gradient-primary hover:shadow-glow transition-all duration-200"
           >
@@ -215,7 +216,7 @@ export const MyComponent: React.FC<Props> = ({ title, children }) => {
             Novo Template
           </Button>
           {templates.length === 0 && (
-            <Button 
+            <Button
               onClick={createSampleData}
               variant="outline"
             >
@@ -248,8 +249,8 @@ export const MyComponent: React.FC<Props> = ({ title, children }) => {
           {mappedCategories.map((category) => {
             const Icon = category.icon;
             return (
-              <TabsTrigger 
-                key={category.id} 
+              <TabsTrigger
+                key={category.id}
                 value={category.id}
                 className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
@@ -277,7 +278,7 @@ export const MyComponent: React.FC<Props> = ({ title, children }) => {
                         </CardTitle>
                         <p className="text-sm text-muted-foreground mt-1">{stripHtml(template.description)}</p>
                       </div>
-                      
+
                       <div className="flex items-center gap-2">
                         <Badge variant="outline" className="text-xs">
                           {template.language}
@@ -285,7 +286,7 @@ export const MyComponent: React.FC<Props> = ({ title, children }) => {
                       </div>
                     </div>
                   </CardHeader>
-                  
+
                   <CardContent className="space-y-4">
                     {/* Tags */}
                     <div className="flex flex-wrap gap-1">
@@ -341,33 +342,33 @@ export const MyComponent: React.FC<Props> = ({ title, children }) => {
 
                     {/* Actions */}
                     <div className="grid grid-cols-2 gap-2 pt-2">
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         variant="outline"
                         onClick={() => handleCopyCode(template.code, template.id)}
                       >
                         <Copy className="w-4 h-4 mr-1" />
                         {copySuccess ? 'Copiado!' : 'Copiar'}
                       </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
+                      <Button
+                        size="sm"
+                        variant="outline"
                         onClick={() => handleEditTemplate(template)}
                       >
                         <Edit className="w-4 h-4 mr-1" />
                         Editar
                       </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
+                      <Button
+                        size="sm"
+                        variant="outline"
                         className="col-span-1"
                         onClick={() => setViewingTemplate(template)}
                       >
                         <ExternalLink className="w-4 h-4 mr-1" />
                         Ver Completo
                       </Button>
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         variant="outline"
                         className="text-destructive hover:text-destructive-foreground hover:bg-destructive"
                         onClick={() => handleDeleteTemplate(template.id)}
@@ -388,7 +389,7 @@ export const MyComponent: React.FC<Props> = ({ title, children }) => {
                   {templates.length === 0 ? 'Nenhum template cadastrado' : 'Nenhum template encontrado'}
                 </h3>
                 <p className="text-muted-foreground mb-4">
-                  {templates.length === 0 
+                  {templates.length === 0
                     ? 'Comece criando seu primeiro template de código ou use o botão "Criar Exemplo" para dados de teste.'
                     : 'Tente ajustar os filtros de categoria ou termo de busca.'
                   }
@@ -423,7 +424,7 @@ export const MyComponent: React.FC<Props> = ({ title, children }) => {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-gradient-surface border-border">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -435,7 +436,7 @@ export const MyComponent: React.FC<Props> = ({ title, children }) => {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-gradient-surface border-border">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -447,7 +448,7 @@ export const MyComponent: React.FC<Props> = ({ title, children }) => {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-gradient-surface border-border">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -470,7 +471,7 @@ export const MyComponent: React.FC<Props> = ({ title, children }) => {
               {viewingTemplate?.title}
             </DialogTitle>
           </DialogHeader>
-          
+
           {viewingTemplate && (
             <div className="flex-1 overflow-hidden flex flex-col gap-4">
               {/* Informações do Template */}

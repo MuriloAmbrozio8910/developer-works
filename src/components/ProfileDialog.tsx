@@ -50,7 +50,7 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
 
       if (file) {
         const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
-        const path = `avatars/${currentEmployee.id}-${Date.now()}.${ext}`
+        const path = `${currentEmployee.user_id}/${Date.now()}.${ext}`
 
         // Upload to Supabase Storage (make sure a public bucket named 'avatars' exists)
         const { error: uploadErr } = await supabase.storage.from('avatars').upload(path, file, {

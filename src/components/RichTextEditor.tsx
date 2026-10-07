@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useCallback } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { supabase } from "@/lib/supabase";
@@ -17,19 +17,19 @@ interface RichTextEditorProps {
   folderPrefix?: string; // Prefixo opcional para subpastas adicionais
 }
 
-export function RichTextEditor({ 
-  value, 
-  onChange, 
-  placeholder, 
-  className, 
-  minHeight = 120, 
+export function RichTextEditor({
+  value,
+  onChange,
+  placeholder,
+  className,
+  minHeight = 120,
   context = 'global',
   folderPrefix = ''
 }: RichTextEditorProps) {
   const quillRef = useRef<ReactQuill | null>(null);
   // Não é mais necessário o useAuth, usaremos session do Supabase
 
-  const handleImageUpload = async () => {
+  const handleImageUpload = useCallback(async () => {
     try {
       const input = document.createElement("input");
       input.type = "file";
@@ -63,7 +63,7 @@ export function RichTextEditor({
           const userId = session?.user?.id || 'anonymous';
           const timestamp = Date.now();
           const randomId = Math.random().toString(36).slice(2, 8);
-          
+
           // Estrutura de pastas: {context}/{folderPrefix}/{userId}/{timestamp}-{randomId}.{ext}
           const folderPath = [context, folderPrefix, userId].filter(Boolean).join('/');
           const filePath = `${folderPath}/${timestamp}-${randomId}.${extension}`;
@@ -102,7 +102,7 @@ export function RichTextEditor({
       console.error("Erro inesperado:", err);
       toast.error("Erro inesperado ao processar a imagem");
     }
-  };
+  }, [context, folderPrefix]);
 
   const modules = useMemo(() => ({
     toolbar: {
@@ -122,7 +122,7 @@ export function RichTextEditor({
       },
     },
     clipboard: { matchVisual: false },
-  }), [context, folderPrefix]);
+  }), [handleImageUpload]);
 
   const formats = useMemo(
     () => [
@@ -155,7 +155,7 @@ export function RichTextEditor({
       border-top-right-radius: 0.375rem;
       background-color: hsl(var(--muted)/0.2);
     }
-    
+
     .rich-text-editor .ql-container.ql-snow {
       border: 1px solid hsl(var(--border));
       border-top: none;
@@ -163,45 +163,45 @@ export function RichTextEditor({
       border-bottom-right-radius: 0.375rem;
       background-color: hsl(var(--background));
     }
-    
+
     .rich-text-editor .ql-editor {
       min-height: ${minHeight}px;
       color: hsl(var(--foreground));
     }
-    
+
     .rich-text-editor .ql-snow .ql-stroke {
       stroke: hsl(var(--muted-foreground));
     }
-    
+
     .rich-text-editor .ql-snow .ql-fill {
       fill: hsl(var(--muted-foreground));
     }
-    
+
     .rich-text-editor .ql-snow .ql-picker {
       color: hsl(var(--muted-foreground));
     }
-    
+
     .rich-text-editor .ql-snow .ql-picker-options {
       background-color: hsl(var(--popover));
       border-color: hsl(var(--border));
     }
-    
+
     .rich-text-editor .ql-snow .ql-picker-item.ql-selected {
       color: hsl(var(--primary));
     }
-    
+
     .rich-text-editor .ql-snow .ql-tooltip {
       background-color: hsl(var(--popover));
       border-color: hsl(var(--border));
       color: hsl(var(--foreground));
     }
-    
+
     .rich-text-editor .ql-snow .ql-tooltip input[type=text] {
       background-color: hsl(var(--muted));
       border-color: hsl(var(--border));
       color: hsl(var(--foreground));
     }
-    
+
     .rich-text-editor .ql-editor.ql-blank::before {
       color: hsl(var(--muted-foreground));
       font-style: normal;

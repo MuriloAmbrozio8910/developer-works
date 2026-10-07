@@ -1,3 +1,4 @@
+import type { LucideIcon } from "lucide-react";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -5,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loading, ErrorState, EmptyState } from "@/components/ui/loading";
 import { useResources } from "@/hooks/useResources";
-import { 
-  Download, 
+import {
+  Download,
   Search,
   ExternalLink,
   Smartphone,
@@ -25,7 +26,7 @@ export default function Resources() {
   const [searchTerm, setSearchTerm] = useState("");
   const { resources, categories, quickLinks, loading, error, incrementDownloads } = useResources();
 
-  const handleDownload = async (resource: any) => {
+  const handleDownload = async (resource: (typeof resources)[number]) => {
     try {
       await incrementDownloads(resource.id);
       window.open(resource.url, '_blank');
@@ -53,7 +54,7 @@ export default function Resources() {
   })).filter(category => category.resources.length > 0);
 
   function getIconByName(iconName: string) {
-    const icons: { [key: string]: any } = {
+    const icons: Record<string, LucideIcon> = {
       Code,
       Palette,
       Settings,
@@ -66,8 +67,8 @@ export default function Resources() {
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
-      <Star 
-        key={i} 
+      <Star
+        key={i}
         className={`w-3 h-3 ${i < rating ? 'text-yellow-400 fill-current' : 'text-muted-foreground'}`}
       />
     ));
@@ -167,7 +168,7 @@ export default function Resources() {
                         </Badge>
                       </div>
                     </CardHeader>
-                    
+
                     <CardContent className="space-y-4">
                       {/* Rating */}
                       <div className="flex items-center gap-2">
@@ -209,7 +210,7 @@ export default function Resources() {
                       </div>
 
                       {/* Download Button */}
-                      <Button 
+                      <Button
                         className="w-full bg-gradient-primary hover:shadow-glow transition-all duration-200"
                         onClick={() => handleDownload(resource)}
                       >
@@ -223,7 +224,7 @@ export default function Resources() {
             </div>
           );
         })}
-        
+
         {filteredCategories.length === 0 && (
           <EmptyState
             icon={Search}
@@ -246,7 +247,7 @@ export default function Resources() {
             <div className="space-y-3">
               <h4 className="font-medium text-foreground">Para Novos Funcionários</h4>
               <p className="text-sm text-muted-foreground">
-                Se você é novo na empresa, recomendamos começar com o Manual do Funcionário 
+                Se você é novo na empresa, recomendamos começar com o Manual do Funcionário
                 e seguir o guia de Configurações de Ambiente.
               </p>
               <Button variant="outline" size="sm">
@@ -254,11 +255,11 @@ export default function Resources() {
                 Ver Guia de Iniciação
               </Button>
             </div>
-            
+
             <div className="space-y-3">
               <h4 className="font-medium text-foreground">Suporte Técnico</h4>
               <p className="text-sm text-muted-foreground">
-                Problemas com instalação ou configuração? Entre em contato com nossa 
+                Problemas com instalação ou configuração? Entre em contato com nossa
                 equipe de TI pelo Slack ou email.
               </p>
               <Button variant="outline" size="sm">

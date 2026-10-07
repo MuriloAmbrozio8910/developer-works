@@ -1,8 +1,8 @@
 {
-  "name": "image-press",
+  "name": "developer-works",
   "private": true,
   "version": "1.0.0",
-  "description": "Plataforma de Gestão de Desenvolvimento",
+  "description": "Plataforma de GestÃ£o de Desenvolvimento",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,7 +11,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint . --ext ts,tsx --fix",
     "preview": "vite preview",
-    "type-check": "tsc --noEmit",
+    "type-check": "tsc --noEmit -p tsconfig.app.json",
     "vercel-build": "npm run build"
   },
   "engines": {
